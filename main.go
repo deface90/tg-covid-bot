@@ -91,7 +91,7 @@ func main() {
             answer += fmt.Sprintf("\nDeaths: %v (%v)",cels.Eq(3).Text(), cels.Eq(4).Text())
         })
 
-        answer += "\n\nLast news:"
+        answer += "\n\nLast news:\n\n"
         doc.Find("#newsdate" + time.Now().Format("2006-01-02") + " li.news_li").Each(func(i int, s *goquery.Selection) {
             if i > 5 {
                 return
