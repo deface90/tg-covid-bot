@@ -4,6 +4,8 @@ import (
     "fmt"
     "log"
     "net/http"
+    "strings"
+    "time"
 
     "github.com/PuerkitoBio/goquery"
     "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -76,16 +78,25 @@ func main() {
             }
         })
 
+        country := strings.ToLower(update.Message.Text[1:])
         doc.Find("#main_table_countries_today a.mt_a").Each(func(i int, s *goquery.Selection) {
-            if s.Text() != "Russia" {
+            if strings.ToLower(s.Text()) != country {
                 return
             }
 
-            answer += "\n\n Russia:"
+            answer += fmt.Sprintf("\n\n%v", country)
             cels := s.ParentsFiltered("tr").ChildrenFiltered("td")
             answer += fmt.Sprintf("\nCases: %v (%v)",cels.Eq(1).Text(), cels.Eq(2).Text())
             answer += fmt.Sprintf("\nRecovered: %v", cels.Eq(5).Text())
             answer += fmt.Sprintf("\nDeaths: %v (%v)",cels.Eq(3).Text(), cels.Eq(4).Text())
+        })
+
+        answer += "\n\nLast news:"
+        doc.Find("#newsdate" + time.Now().Format("2006-01-02") + " li.news_li").Each(func(i int, s *goquery.Selection) {
+            if i > 5 {
+                return
+            }
+            answer += fmt.Sprintf("%s\n", strings.Replace(s.Text(), "[source]", "", -1))
         })
 
         _ = res.Body.Close()
