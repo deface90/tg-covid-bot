@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
     "log"
     "net/http"
 
@@ -26,7 +27,7 @@ func main() {
         log.Panic(err)
     }
 
-    bot.Debug = true
+    bot.Debug = false
 
     log.Printf("Authorized on account %s", bot.Self.UserName)
 
@@ -73,6 +74,18 @@ func main() {
             if h == "Deaths:" {
                 answer += "\nDeaths: " + s.Find("span").Text()
             }
+        })
+
+        doc.Find("#main_table_countries_today a.mt_a").Each(func(i int, s *goquery.Selection) {
+            if s.Text() != "Russia" {
+                return
+            }
+
+            answer += "\n\n Russia:"
+            cels := s.ParentsFiltered("tr").ChildrenFiltered("td")
+            answer += fmt.Sprintf("\nCases: %v (%v)",cels.Eq(1).Text(), cels.Eq(2).Text())
+            answer += fmt.Sprintf("\nRecovered: %v", cels.Eq(5).Text())
+            answer += fmt.Sprintf("\nDeaths: %v (%v)",cels.Eq(3).Text(), cels.Eq(4).Text())
         })
 
         _ = res.Body.Close()

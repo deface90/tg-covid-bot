@@ -1,4 +1,4 @@
-module github.com/deface90/tg-covid-bot
+ module github.com/deface90/tg-covid-bot
 
 go 1.14
 
